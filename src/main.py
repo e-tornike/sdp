@@ -88,27 +88,26 @@ def eval(path_gold):
 
 
 if __name__ == "__main__":
-    # path_train = "/home/tony/Coding/MA/ws2021/sdp/data/english/train/wsj_train.only-projective.conll06"
-    # path_dev = "/home/tony/Coding/MA/ws2021/sdp/data/english/dev/wsj_dev.conll06.blind"
-    # path_test = "/home/tony/Coding/MA/ws2021/sdp/data/english/test/wsj_test.conll06.blind"
-    # lang = "en"
-    # debug = False
+    path_train = "/home/tony/Coding/MA/ws2021/sdp/data/english/train/wsj_train.only-projective.conll06"
+    path_dev = "/home/tony/Coding/MA/ws2021/sdp/data/english/dev/wsj_dev.conll06.blind"
+    path_test = "/home/tony/Coding/MA/ws2021/sdp/data/english/test/wsj_test.conll06.blind"
+    lang = "en"
+    debug = False
 
-    # main(path_train, path_dev, path_test, lang, epochs=20, debug=debug)
+    main(path_train, path_dev, path_test, lang, epochs=50, debug=debug)
 
-    # print("Train acc:", eval(path_train))
-    # print("Dev acc:", eval(path_dev))
+    print("Train acc:", eval(path_train))
+    print("Dev acc:", eval(path_dev))
 
     print("================")
 
     path_train = "/home/tony/Coding/MA/ws2021/sdp/data/german/train/tiger-2.2.train.only-projective.conll06"
-    # path_train = "/home/tony/Coding/MA/ws2021/sdp/data/german/train/example.train.conll06"
     path_dev = "/home/tony/Coding/MA/ws2021/sdp/data/german/dev/tiger-2.2.dev.conll06.blind"
     path_test = "/home/tony/Coding/MA/ws2021/sdp/data/german/test/tiger-2.2.test.conll06.blind"
-    lang = "en"
+    lang = "de"
     debug = False
 
-    main(path_train, path_dev, path_test, lang, epochs=5, debug=debug)
+    main(path_train, path_dev, path_test, lang, epochs=50, debug=debug)
 
     print("Train acc:", eval(path_train))
     print("Dev acc:", eval(path_dev))

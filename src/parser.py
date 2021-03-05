@@ -46,17 +46,6 @@ class ArcStandard(TransitionParser):
 
             return c
 
-    def can_leftArc(self, c) -> bool:
-        if c.stack ==[] or c.buffer == []:
-            return False
-        else:
-            top_stack = c.stack[-1]
-
-            if top_stack != 0:
-                return True
-            else:
-                return False
-
     def rightArc(self, c) -> State:
         if c.stack == [] or c.buffer == []:
             return
@@ -71,12 +60,6 @@ class ArcStandard(TransitionParser):
 
         return c
 
-    def can_rightArc(self, c) -> bool:
-        if c.stack == [] or c.buffer ==[]:
-            return False
-        else:
-            return True
-
     def shift(self, c) -> State:
         if len(c.buffer) > 1 or c.stack == []:
 
@@ -86,53 +69,28 @@ class ArcStandard(TransitionParser):
 
             return c
 
+    def can_leftArc(self, c) -> bool:
+        if c.stack ==[] or c.buffer == []:
+            return False
+        else:
+            top_stack = c.stack[-1]
+
+            if top_stack != 0:
+                return True
+            else:
+                return False
+
+    def can_rightArc(self, c) -> bool:
+        if c.stack == [] or c.buffer ==[]:
+            return False
+        else:
+            return True
+
     def can_shift(self, c) -> bool:
         if len(c.buffer) > 1 or c.stack == []:
             return True
         else:
             return False
-
-    def apply_transition(self, c: State, t: str) -> None:    
-        if t == "LARC":
-            try:
-                self.leftArc(c)
-            except:
-                print("Could not execute transition: LARC")
-        elif t == "RARC":
-            try:
-                self.rightArc(c)
-            except:
-                print("Could not execute transition: RARC")
-        elif t == "SHIFT":
-            try:
-                self.shift(c)
-            except:
-                print("Could not execute transition: RARC")
-        else:
-            print(f"Invalid transition: {t}")
-
-    def hasAllChildren(self, front_buffer: int, arcs_current: List[Tuple], arcs_gold: List[Tuple]) -> bool:
-        b = front_buffer
-        for t in arcs_gold:
-            if (b == t[0] and t not in arcs_current and "R" == t[1]) or (b == t[2] and t not in arcs_current and "L" == t[1]):
-                return False
-        return True
-
-    # def hasHead(self, dep_idx: int, c: State) -> bool:
-    #     arcs = c.arcs
-
-    #     for (a,l,b) in arcs:
-    #         if l == "L":
-    #             dep = a
-    #         elif l == "R":
-    #             dep = b
-    #         else:
-    #             raise Exception(f"Wrong relation: {l}\nArcs: {arcs}")
-            
-    #         if dep_idx == dep:
-    #             return True
-
-    #     return False
 
     def shouldLeftArc(self, c: State, gold_arcs: List[Tuple]) -> bool:
         if c.stack == []:
@@ -157,55 +115,15 @@ class ArcStandard(TransitionParser):
             return True
         else:
             return False
-    
-    def oracleParse(self, s: State, sentence: Sentence, fm: FeatureMap) -> List[FeatureItem]:
-        seq = []
-        c = deepcopy(s)
 
-        gold_arcs = getArcs(sentence)
-
-        # print("Starting state:")
-        # print("Stack:", c.stack)
-        # print("Buffer:", c.buffer)
-        # print("Arcs:", c.arcs)
-        # print("Gold arcs:", gold_arcs)
-        # print("======================")
-        # print("\n")
-
-        while self.notTerminal(c):
-            features = fm.get_features(c, sentence)
-            if self.shouldLeftArc(c, gold_arcs):
-                t = "LARC"
-            elif self.shouldRightArc(c, gold_arcs):
-                t = "RARC"
-            else:
-                t = "SHIFT"
-            
-            self.apply_transition(c, t)
-
-            item = FeatureItem(t, features)
-            seq.append(item)
-
-            # print("Transition:", t)
-            # print("Stack:", c.stack)
-            # print("Buffer:", c.buffer)
-            # print("Arcs:", c.arcs)
-            # print("Seq:", [t.transition for t in seq])
-            # print("\n")
-
-        # print("\n")
-        # print("======================")
-        # print("\n")
-        # print("Ending state:")
-        # print("Stack:", c.stack)
-        # print("Buffer:", c.buffer)
-        # print("Arcs:", c.arcs)
-        # print("Seq:", [t.transition for t in seq])
-
-        return (c.arcs, gold_arcs), seq
+    def hasAllChildren(self, front_buffer: int, arcs_current: List[Tuple], arcs_gold: List[Tuple]) -> bool:
+        b = front_buffer
+        for t in arcs_gold:
+            if (b == t[0] and t not in arcs_current and "R" == t[1]) or (b == t[2] and t not in arcs_current and "L" == t[1]):
+                return False
+        return True
 
     def findFirstValid(self, scores: dict, c: State) -> str:
-
         for (t, score) in scores:
             if t == "LARC":
                 if self.can_leftArc(c):
@@ -219,48 +137,114 @@ class ArcStandard(TransitionParser):
             else:
                 print(f"Invalid transition: {t}")
 
-    def parse(self, s: State, sentence: Sentence, fm: FeatureMap, model: Perceptron) -> List[FeatureItem]:
+    def apply_transition(self, c: State, t: str) -> None:    
+        if t == "LARC":
+            try:
+                self.leftArc(c)
+            except:
+                print("Could not execute transition: LARC")
+        elif t == "RARC":
+            try:
+                self.rightArc(c)
+            except:
+                print("Could not execute transition: RARC")
+        elif t == "SHIFT":
+            try:
+                self.shift(c)
+            except:
+                print("Could not execute transition: RARC")
+        else:
+            print(f"Invalid transition: {t}")
+    
+    def oracleParse(self, s: State, sentence: Sentence, fm: FeatureMap, debug: bool = False) -> List[FeatureItem]:
         seq = []
         c = deepcopy(s)
 
-        # print("Starting state:")
-        # print("Stack:", c.stack)
-        # print("Buffer:", c.buffer)
-        # print("Arcs:", c.arcs)
-        # print("======================")
-        # print("\n")
+        gold_arcs = getArcs(sentence)
 
-        # fm = FeatureMap()
+        if debug:
+            print("Starting state:")
+            print("Stack:", c.stack)
+            print("Buffer:", c.buffer)
+            print("Arcs:", c.arcs)
+            print("Gold arcs:", gold_arcs)
+            print("======================")
+            print("\n")
 
         while self.notTerminal(c):
-            features = fm.get_features(c, sentence)
-
-            scores = scoreTransitions(c, features, model, ["LARC", "RARC", "SHIFT"])
-            # print("Scores:", scores)
-            t,_ = self.findFirstValid(scores, c)
+            features = fm.get_features(c, sentence, debug=debug)
+            if self.shouldLeftArc(c, gold_arcs):
+                t = "LARC"
+            elif self.shouldRightArc(c, gold_arcs):
+                t = "RARC"
+            else:
+                t = "SHIFT"
+            
             self.apply_transition(c, t)
-            # print("First valid:", t)
-            ##### self.apply_transition(c, t)
 
             item = FeatureItem(t, features)
             seq.append(item)
 
-            # print("Stack:", c.stack)
-            # print("Buffer:", c.buffer)
-            # print("Arcs:", c.arcs)
-            # print("Seq:", [t.transition for t in seq])
-            # print("\n")
+            if debug:
+                print("Transition:", t)
+                print("Stack:", c.stack)
+                print("Buffer:", c.buffer)
+                print("Arcs:", c.arcs)
+                print("Seq:", [t.transition for t in seq])
+                print("\n")
 
-            # break
-        
-        # print("\n")
-        # print("======================")
-        # print("\n")
-        # print("Ending state:")
-        # print("Stack:", c.stack)
-        # print("Buffer:", c.buffer)
-        # print("Arcs:", c.arcs)
-        # print("Seq:", [t.transition for t in seq])
+        if debug:
+            print("\n")
+            print("======================")
+            print("\n")
+            print("Ending state:")
+            print("Stack:", c.stack)
+            print("Buffer:", c.buffer)
+            print("Arcs:", c.arcs)
+            print("Seq:", [t.transition for t in seq])
+
+        return (c.arcs, gold_arcs), seq
+
+    def parse(self, s: State, sentence: Sentence, fm: FeatureMap, model: Perceptron, debug: bool = False) -> List[FeatureItem]:
+        seq = []
+        c = deepcopy(s)
+
+        if debug:
+            print("Starting state:")
+            print("Stack:", c.stack)
+            print("Buffer:", c.buffer)
+            print("Arcs:", c.arcs)
+            print("======================")
+            print("\n")
+
+        while self.notTerminal(c):
+            features = fm.get_features(c, sentence, debug=debug)
+
+            scores = scoreTransitions(c, features, model, ["LARC", "RARC", "SHIFT"])
+            t,_ = self.findFirstValid(scores, c)
+            self.apply_transition(c, t)
+
+            item = FeatureItem(t, features)
+            seq.append(item)
+
+            if debug:
+                print("Scores:", scores)
+                print("First valid:", t)
+                print("Stack:", c.stack)
+                print("Buffer:", c.buffer)
+                print("Arcs:", c.arcs)
+                print("Seq:", [t.transition for t in seq])
+                print("\n")
+
+        if debug:
+            print("\n")
+            print("======================")
+            print("\n")
+            print("Ending state:")
+            print("Stack:", c.stack)
+            print("Buffer:", c.buffer)
+            print("Arcs:", c.arcs)
+            print("Seq:", [t.transition for t in seq])
 
         return c.arcs, seq
 

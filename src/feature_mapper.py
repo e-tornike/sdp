@@ -29,12 +29,6 @@ class FeatureMap:
         xpos = [t.xpos for t in s.tokens]
         morph = [t.morph for t in s.tokens]
 
-        # print(len(form), "Form:", form)
-        # print(len(lemma), "Lemma:", lemma)
-        # print(len(pos), "POS:", pos)
-        # print(len(xpos), "XPOS:", xpos)
-        # print(len(morph), "Morph:", morph)
-
         if c.buffer != []:
             # Features for B[0]
             b0 = c.buffer[0]-1
@@ -49,16 +43,19 @@ class FeatureMap:
                 b1 = c.buffer[1]-1
                 features.append(self.get_feature(f"B[1]:form:{form[b1]}"))
                 # features.append(self.get_feature(f"B[1]:fpos:{xpos[b1]}"))
+                features.append(self.get_feature(f"B[1]:cpos:{pos[b1]}"))
             
             # Features for B[2]
             if len(c.buffer) > 2:
                 b2 = c.buffer[2]-1
                 # features.append(self.get_feature(f"B[2]:fpos:{xpos[b2]}"))
+                features.append(self.get_feature(f"B[2]:cpos:{pos[b2]}"))
             
             # Features for B[3]
             if len(c.buffer) > 3:
                 b3 = c.buffer[3]-1
                 # features.append(self.get_feature(f"B[3]:fpos:{xpos[b3]}"))
+                features.append(self.get_feature(f"B[3]:cpos:{pos[b3]}"))
 
             # # Features for ld(B[0])
             # if c.ld[b0] >= 0:
@@ -82,6 +79,7 @@ class FeatureMap:
             if len(c.stack) > 1:
                 s1 = c.stack[-2]-1
                 # features.append(self.get_feature(f"S[1]:fpos:{xpos[s1]}"))
+                features.append(self.get_feature(f"S[1]:cpos:{pos[s1]}"))
             
             # Features for hd(S[0]) TODO Only E
 
@@ -93,9 +91,8 @@ class FeatureMap:
             # if c.rd[s0] >= 0:
             #     features.append(self.get_feature(f"rd(S[0]):dep:{c.rd[s0]}"))
 
-        self.feature_map_reverse = {v:k for k,v in self.feature_map.items()}
-
         if debug:
+            self.feature_map_reverse = {v:k for k,v in self.feature_map.items()}
             print("\n===")
             print(f"Sentence:", [(t.id, t.form, t.lemma, t.pos, t.xpos, t.morph) for t in s.tokens])
             print(f"Stack:", c.stack)

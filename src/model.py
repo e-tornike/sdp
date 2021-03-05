@@ -17,11 +17,11 @@ class Perceptron:
 
     def save(self, language):
         timestr = time.strftime("%Y%m%d-%H%M%S")
-        model_path = f"../models/{language}_model_{timestr}.pkl"
+        model_path = f"./models/{language}_model_{timestr}.pkl"
         with open(model_path, "wb") as f:
             pickle.dump(self.w, f, -1)
 
-        with open(f"../models/{language}_featuremap_{timestr}.json", "w") as f:
+        with open(f"./models/{language}_featuremap_{timestr}.json", "w") as f:
             json.dump(self.fm, f)
 
         print(f"Saved model to {model_path}")
@@ -45,7 +45,7 @@ class Perceptron:
         # j = 0
         # u = np.zeros(self.w.shape, dtype=np.float32)
 
-        for e in range(epochs):
+        for e in tqdm(range(epochs)):
             correct = 0
             n = 0
 
@@ -77,9 +77,10 @@ class Perceptron:
                         # u[self.labels[item.transition]][idx-1] += q
                         # u[y_pred][idx-1] -= q
                 else:
+                    # self.w[self.labels[item.transition]][idx-1] += 1
                     correct += 1
 
-            print(f"Accuracy for epoch {e} state {n}: {correct/n}")
+            print(f"Accuracy for epoch {e+1}: {correct/n}")
 
             # self.w -= u * (1/q)  # averaged perceptron
 
@@ -104,7 +105,7 @@ class Perceptron:
         print(f"Accuracy: {acc}\nF1: {f1}")
 
 
-def scoreTransitions(c: State, features: List, model: Perceptron, transitions: List[str]) -> List[Tuple]:
+def scoreTransitions(c: State, features: List, model: Perceptron, transitions: List[str], debug: bool = False) -> List[Tuple]:
         scores = {}
 
         # TODO
@@ -112,12 +113,17 @@ def scoreTransitions(c: State, features: List, model: Perceptron, transitions: L
         #     scores[t] = random.random()
 
         # sorted_scores = sorted(scores.items(), key=lambda item: item[1], reverse=True)
-        
+        idxs = []
+
         scores = np.zeros((len(transitions)))
         for idx in features:  # TODO make instance
             # print("IDX:", idx)
             for r in range(model.w.shape[0]):
                 scores[r] += model.w[r][idx-1]
+                idxs.append(idx-1)
+
+        if debug:
+            print("IDs:", idxs)
         
         scores = {t:scores[i] for i,t in enumerate(transitions)}
         sorted_scores = sorted(scores.items(), key=lambda item: item[1], reverse=True)

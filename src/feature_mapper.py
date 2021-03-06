@@ -120,31 +120,8 @@ class FeatureMap:
             # # Features for rd(S[0])
             # if c.rd[s0] >= 0:
             #     features.append(self.get_feature(f"rd(S[0]):dep:{c.rd[s0]}"))
-        # if c.stack != []:
-        #     if c.stack[-1] == 0:
-        #         print("\n===")
-        #         print(f"Sentence:", [(t.id, t.form, t.lemma, t.pos, t.xpos, t.morph) for t in s.tokens])
-        #         print(f"Stack:", c.stack)
-        #         print(f"Buffer:", c.buffer)
-        #         print("=")
-        #         print(f"Features:", features)
-        #         print(f"Features length:", len(self.feature_map_reverse))
-        #         print(f"Features:", [self.feature_map_reverse[f] for f in features])
-        #         print("===\n")
-        # if c.buffer != []:
-        #     if c.buffer[0] == 0:
-        #         print("\n===")
-        #         print(f"Sentence:", [(t.id, t.form, t.lemma, t.pos, t.xpos, t.morph) for t in s.tokens])
-        #         print(f"Stack:", c.stack)
-        #         print(f"Buffer:", c.buffer)
-        #         print("=")
-        #         print(f"Features:", features)
-        #         print(f"Features length:", len(self.feature_map_reverse))
-        #         print(f"Features:", [self.feature_map_reverse[f] for f in features])
-        #         print("===\n")
 
         if debug:
-            # self.feature_map_reverse = {v:k for k,v in self.feature_map.items()}
             print("\n===")
             print(f"Sentence:", [(t.id, t.form, t.lemma, t.pos, t.xpos, t.morph) for t in s.tokens])
             print(f"Stack:", c.stack)

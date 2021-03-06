@@ -16,6 +16,8 @@ class Perceptron:
         self.labels = labels
 
     def save(self, language):
+        if not Path('./models').is_dir():
+            Path('./models').mkdir()
         timestr = time.strftime("%Y%m%d-%H%M%S")
         model_path = f"./models/{language}_model_{timestr}.pkl"
         with open(model_path, "wb") as f:

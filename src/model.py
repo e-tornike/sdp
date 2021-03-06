@@ -42,7 +42,6 @@ class Perceptron:
         - Save feature_map and weights
         """
         q = 0
-        # j = 0
         # u = np.zeros(self.w.shape, dtype=np.float32)
 
         for e in tqdm(range(epochs)):
@@ -57,15 +56,12 @@ class Perceptron:
                 n += 1
 
                 scores = np.zeros((len(self.labels),))
-                # feature_vec = np.ones((len(item.features),), dtype=np.float32)
 
                 for idx in item.features:
                     for r in range(self.w.shape[0]):
                         scores[r] += self.w[r][idx-1]
 
                 y_pred = np.argmax(scores)
-
-                # y_pred = self.sign(np.dot(self.w, self.phi(item)))
 
                 if y_pred != self.labels[item.transition]:
                     for idx in item.features:
@@ -77,7 +73,6 @@ class Perceptron:
                         # u[self.labels[item.transition]][idx-1] += q
                         # u[y_pred][idx-1] -= q
                 else:
-                    # self.w[self.labels[item.transition]][idx-1] += 1
                     correct += 1
 
             print(f"Accuracy for epoch {e+1}: {correct/n}")
@@ -105,22 +100,19 @@ class Perceptron:
         print(f"Accuracy: {acc}\nF1: {f1}")
 
 
-def scoreTransitions(c: State, features: List, model: Perceptron, transitions: List[str], debug: bool = False) -> List[Tuple]:
+def scoreTransitions(c: State, features: List, model: Perceptron, transitions: List[str], debug: bool = False, random: bool = False) -> List[Tuple]:
         scores = {}
-
-        # TODO
-        # for t in transitions:
-        #     scores[t] = random.random()
-
-        # sorted_scores = sorted(scores.items(), key=lambda item: item[1], reverse=True)
         idxs = []
-
-        scores = np.zeros((len(transitions)))
-        for idx in features:  # TODO make instance
-            # print("IDX:", idx)
-            for r in range(model.w.shape[0]):
-                scores[r] += model.w[r][idx-1]
-                idxs.append(idx-1)
+        
+        if random:
+            for t in transitions:
+                scores[t] = random.random()
+        else:
+            scores = np.zeros((len(transitions)))
+            for idx in features:
+                for r in range(model.w.shape[0]):
+                    scores[r] += model.w[r][idx-1]
+                    idxs.append(idx-1)
 
         if debug:
             print("IDs:", idxs)

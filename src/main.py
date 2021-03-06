@@ -20,6 +20,7 @@ import random
 from sklearn.metrics import f1_score, accuracy_score
 from tqdm import tqdm
 import json
+import argparse
 
 
 def test(data, model, fm, parser, path, debug=False):
@@ -38,13 +39,13 @@ def test(data, model, fm, parser, path, debug=False):
     else:
         write_file(path+".preds", preds)
 
-def main(path_train, path_dev, path_test, language, epochs=5, shuffle=True, debug=False, final=False):
+def main(path_train, path_dev=None, path_test=None, epochs=5, shuffle=True, debug=False):
     print("Reading files...")
-    sentences_train = read_file(path_train, lang=language)
-    if final:
-        path_dev = path_dev.replace(".blind", ".gold")
-    sentences_dev = read_file(path_dev, lang=language)
-    sentences_test = read_file(path_test, lang=language)
+    sentences_train = read_file(path_train)
+    if path_dev:
+        sentences_dev = read_file(path_dev)
+    if path_test:
+        sentences_test = read_file(path_test)
 
     fm = FeatureMap()
     parser = ArcStandard()
@@ -58,12 +59,6 @@ def main(path_train, path_dev, path_test, language, epochs=5, shuffle=True, debu
         state = State(sentence)
         _, gold_seq = parser.oracleParse(state, sentence, fm, debug=debug)
         train_data += gold_seq
-
-    if final:
-        for i, sentence in enumerate(tqdm(sentences_dev)):
-            state = State(sentence)
-            _, gold_seq = parser.oracleParse(state, sentence, fm, debug=debug)
-            train_data += gold_seq
 
     fm.freeze = True
 
@@ -79,12 +74,14 @@ def main(path_train, path_dev, path_test, language, epochs=5, shuffle=True, debu
     print("Testing...")
 
     test(sentences_train, model, fm, parser, path_train, debug)
-    test(sentences_dev, model, fm, parser, path_dev, debug)
-    test(sentences_test, model, fm, parser, path_test, debug)
+    if path_dev:
+        test(sentences_dev, model, fm, parser, path_dev, debug)
+    if path_test:
+        test(sentences_test, model, fm, parser, path_test, debug)
 
     print("Saving model...")
 
-    model.save(f"lang_{language}_epochs_{str(epochs)}")
+    model.save(f"file_{Path(path_train).name}_epochs_{str(epochs)}")
 
     print("Done.")
 
@@ -103,32 +100,26 @@ def eval(path_gold):
 
 
 if __name__ == "__main__":
-    first_k = False
-    debug = False
-    epochs = 50
-    final = False
-    name = ""
-    if first_k:
-        name = ".first-1k"
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--train', required=True, help='Path to training conll06 file.')
+    parser.add_argument('--dev', required=False, help='Path to development conll06 file.')
+    parser.add_argument('--test', required=False, help='Path to testing conll06 file.')
+    parser.add_argument('--shuffle', default=True, required=False, help='Shuffle training data each epoch.')
+    parser.add_argument('--epochs', default=5, required=False, help='Number of epochs.')
+    parser.add_argument('--debug', default=False, required=False, help='Print debug messages.')
 
-    path_train = f"/home/tony/Coding/MA/ws2021/sdp/data/english/train/wsj_train.only-projective{name}.conll06"
-    path_dev = "/home/tony/Coding/MA/ws2021/sdp/data/english/dev/wsj_dev.conll06.blind"
-    path_test = "/home/tony/Coding/MA/ws2021/sdp/data/english/test/wsj_test.conll06.blind"
-    lang = "en"
+    args = parser.parse_args()
 
-    main(path_train, path_dev, path_test, lang, epochs=epochs, debug=debug, final=final)
+    path_train = args.train if args.train else None
+    path_dev = args.dev if args.dev else None
+    path_test = args.test if args.test else None
+    shuffle = args.shuffle
+    epochs = args.epochs
+    debug = args.debug
 
-    print("Train acc:", eval(path_train))
-    print("Dev acc:", eval(path_dev))
+    print(path_train, path_dev, path_test, shuffle, epochs, debug)
 
-    print("================")
-
-    path_train = f"/home/tony/Coding/MA/ws2021/sdp/data/german/train/tiger-2.2.train.only-projective{name}.conll06"
-    path_dev = "/home/tony/Coding/MA/ws2021/sdp/data/german/dev/tiger-2.2.dev.conll06.blind"
-    path_test = "/home/tony/Coding/MA/ws2021/sdp/data/german/test/tiger-2.2.test.conll06.blind"
-    lang = "de"
-
-    main(path_train, path_dev, path_test, lang, epochs=epochs, debug=debug, final=final)
-
-    print("Train acc:", eval(path_train))
-    print("Dev acc:", eval(path_dev))
+    main(path_train, path_dev, path_test, epochs=epochs, shuffle=shuffle, debug=debug)
+    print("Train UAS score:", eval(path_train))
+    if path_dev:
+        print("Development UAS score:", eval(path_dev))

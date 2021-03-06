@@ -6,7 +6,7 @@ from src.io import Sentence, Token
 import pandas as pd
 
 
-def read_file(filename: str, lang: str = "en") -> List[Sentence]:
+def read_file(filename: str) -> List[Sentence]:
     path = Path(filename)
     assert path.is_file()
 
@@ -20,15 +20,6 @@ def read_file(filename: str, lang: str = "en") -> List[Sentence]:
             sentences.append(Sentence(tokens))
             tokens = []
 
-        # # Change German file formats to match English
-        # if lang == "de":
-        #     if row.REL == "--":
-        #         rel = "ROOT"
-        #     else:
-        #         rel = row.REL
-        # else:
-        #     rel = row.REL
-
         dic = {
             'ID': row.ID, 
             'FORM': row.FORM, 
@@ -37,7 +28,6 @@ def read_file(filename: str, lang: str = "en") -> List[Sentence]:
             'XPOS': row.XPOS, 
             'MORPH': row.MORPH, 
             'HEAD': row.HEAD, 
-            # 'REL': rel,  # this is changed for German files
             'REL': row.REL,
             'X1': row.X1, 
             'X2': row.X2

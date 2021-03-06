@@ -16,5 +16,5 @@ python3 src/main.py --train ./data/english/train/wsj_train.only-projective.first
 Evaluate with official script:
 
 ```
-perl eval07pl.sec -g data/english/dev/wsj_dev.conll06.gold -s data/english/dev/wsj_dev.conll06.preds
+perl eval07pl.sec -g ./data/english/dev/wsj_dev.conll06.gold -s ./data/english/dev/wsj_dev.conll06.preds
 ```

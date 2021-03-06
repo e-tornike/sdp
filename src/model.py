@@ -7,6 +7,7 @@ import json
 import pickle
 from sklearn.metrics import f1_score, accuracy_score
 from tqdm import tqdm
+from pathlib import Path
 
 
 class Perceptron:

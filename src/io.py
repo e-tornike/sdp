@@ -2,10 +2,6 @@ from typing import List, Dict
 
 
 class Token():
-    # form: str = ""
-    # pos: str = ""
-    # head: int = 0
-
     def __init__(self, t: Dict):
         self.id = t['ID']
         self.form = t['FORM']
@@ -20,8 +16,6 @@ class Token():
 
 
 class Sentence():
-    # tokens: List[Token]
-
     def __init__(self, sentence: List[Dict]):
         self.tokens = self.convert2tokens(sentence)
 

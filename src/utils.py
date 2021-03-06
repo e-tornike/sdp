@@ -20,17 +20,6 @@ def addHeads(s: Sentence, pred_arcs: List[Tuple]) -> Sentence:
     sentence = deepcopy(s)
 
     for (head,l,dep) in pred_arcs:
-        # if l == "R":
-        #     head = x
-        #     dep = y
-        # elif l == "L":
-        #     head = y
-        #     dep = x
-        # else:
-        #     print(f"Invalid relation: {l}")
-        #     return
-
         sentence.tokens[dep-1].head = head
-        # sentence.tokens[dep].head = head
 
     return sentence

@@ -9,7 +9,7 @@ from reader import read
 class TestReader:
 
     def test_contents(self):
-        file1 = "/home/tony/Coding/MA/ws2021/sdp/data/english/train/wsj_train.conll06"
+        file1 = "./data/english/train/wsj_train.conll06"
         sentences1 = read(file1)
         assert isinstance(sentences1, List)
         assert isinstance(sentences1[0], Sentence)
@@ -27,7 +27,7 @@ class TestReader:
         assert sentences1[-2].tokens[10].pos == "CD"
         assert sentences1[-2].tokens[10].head == 10
 
-        file2 = "/home/tony/Coding/MA/ws2021/sdp/data/german/dev/tiger-2.2.dev.conll06.gold"
+        file2 = "./data/german/dev/tiger-2.2.dev.conll06.gold"
         sentences2 = read(file2)
         assert isinstance(sentences2, List)
         assert isinstance(sentences2[0], Sentence)
@@ -45,7 +45,7 @@ class TestReader:
         assert sentences2[-2].tokens[15].pos == "VVFIN"
         assert sentences2[-2].tokens[15].head == 1
 
-        file3 = "/home/tony/Coding/MA/ws2021/sdp/data/german/test/tiger-2.2.test.conll06.blind"
+        file3 = "./data/german/test/tiger-2.2.test.conll06.blind"
         sentences3 = read(file3)
         assert isinstance(sentences3, List)
         assert isinstance(sentences3[0], Sentence)
